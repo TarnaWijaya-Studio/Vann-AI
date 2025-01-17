@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <title>Chat dengan AI</title>
-    <link rel="icon" href="https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg" type="image/jpg">
+    <link rel="icon" href="https://i.ibb.co/tXXrhn8/IMG-20250116-WA0049.jpg" type="image/jpg">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
         /* Styles untuk seluruh halaman */
@@ -248,14 +248,13 @@
 <body>
     <div class="header">
         <div class="header-left">
-            <img src="https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg" alt="AI Logo">
+            <img src="https://i.ibb.co/tXXrhn8/IMG-20250116-WA0049.jpg" alt="AI Logo">
             VannAI
         </div>
         <button class="menu-button" onclick="toggleMenu()" aria-label="Toggle menu">☰</button>
         <div class="menu">
             <a href="../help-note.txt">Help</a>
-            <a
-            href="https://github.com/TarnaWijaya-Studio/Tarz-AI/blob/92ff09d13475718ba6ec42887d56ccf56b02d2ce/readme.md">Info</a>
+            <a href="https://github.com/TarnaWijaya-Studio/Tarz-AI/blob/92ff09d13475718ba6ec42887d56ccf56b02d2ce/readme.md">Info</a>
             <a href="https://github.com/TarnaWijaya-Studio/Tarz-AI">Source</a>
             <a href="https://tarnawijaya.github.io/Links-Short-XTarz/">Bio Admin</a>
         </div>
@@ -273,7 +272,9 @@
     <script>
         function toggleMenu() {
             const menuButton = document.querySelector('.menu-button');
+            const menu = document.querySelector('.menu');
             menuButton.classList.toggle('active');
+            menu.classList.toggle('active');
         }
 
         async function sendMessage() {
@@ -283,21 +284,12 @@
 
             if (!text) return;
 
-            const userMessageContainer = document.createElement("div");
-            userMessageContainer.className = "message-container user-container";
-            userMessageContainer.innerHTML = `
-                <div class="message user">${text}</div>
-                <img
-                src="https://i.ibb.co.com/rc13gnG/IMG-20250116-WA0050.jpg" class="profile-img"
-                alt="User" class="profile-img">
-            `;
+            const userMessageContainer = createMessageContainer("user", text);
             chatBox.appendChild(userMessageContainer);
             userInput.value = '';
 
-            // Menyimpan pesan pengguna di localStorage
             saveMessage("user", text);
 
-            // Menampilkan pesan loading AI
             const loadingMessage = createMessageContainer("ai", "• • •");
             chatBox.appendChild(loadingMessage);
             chatBox.scrollTop = chatBox.scrollHeight;
@@ -305,7 +297,7 @@
             try {
                 const reply = await getAIResponse(text);
                 chatBox.removeChild(loadingMessage);
-                const formattedReply = formatBoldText(reply); // Format teks bold
+                const formattedReply = formatBoldText(reply);
                 const aiMessageContainer = createMessageContainer("ai", formattedReply);
                 chatBox.appendChild(aiMessageContainer);
                 saveMessage("ai", reply);
@@ -329,8 +321,8 @@
             const messageContainer = document.createElement("div");
             messageContainer.className = `message-container ${role}-container`;
             const imgSrc = role === "user" ?
-            "https://i.ibb.co.com/rc13gnG/IMG-20250116-WA0050.jpg"
-            : "https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg";
+                "https://i.ibb.co/rc13gnG/IMG-20250116-WA0050.jpg" :
+                "https://i.ibb.co/tXXrhn8/IMG-20250116-WA0049.jpg";
             messageContainer.innerHTML = `
                 <img src="${imgSrc}" class="profile-img" alt="${role}">
                 <div class="message ${role}">${text}</div>
@@ -357,7 +349,9 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text }] }]
+                        prompt: {
+                            parts: [{ text }]
+                        }
                     })
                 });
 
@@ -366,12 +360,20 @@
                 }
 
                 const data = await response.json();
-                return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI-nya Error 🗿";
+                return data.candidates?.[0]?.parts?.[0]?.text || "AI-nya Error 🗿";
             } catch (error) {
                 console.error("Error:", error);
                 return "Error: API tidak bisa diakses.";
             }
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
+            chatHistory.forEach(({ role, text }) => {
+                const messageContainer = createMessageContainer(role, formatBoldText(text));
+                document.getElementById("chat-box").appendChild(messageContainer);
+            });
+        });
     </script>
 </body>
 <!--TarzAI create byTarnaWijaya-->
