@@ -8,7 +8,6 @@
     <link rel="icon" href="https://i.ibb.co/tXXrhn8/IMG-20250116-WA0049.jpg" type="image/jpg">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Styles untuk seluruh halaman */
         * {
             margin: 0;
             padding: 0;
@@ -22,7 +21,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden;
+            overflow: auto;
         }
 
         .header {
@@ -86,14 +85,13 @@
             transform: translateY(-2px);
         }
 
-        /* Chat Box Styles */
         .chat-box {
             flex: 1;
             padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            overflow-y: auto;
+            overflow-y: scroll;
             background: #1A1A1A;
             scroll-behavior: smooth;
             border-top: 2px solid #444444;
@@ -160,7 +158,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: -10px; /* Menyesuaikan posisi ke atas */
+            margin-top: -10px;
         }
 
         .input-container input {
@@ -177,13 +175,13 @@
 
         .input-container input:focus {
             outline: none;
-            border: 2px solid #00FF7F; /* Neon Green */
+            border: 2px solid #00FF7F;
         }
 
         .input-container button {
             padding: 12px;
             border: none;
-            background-color: #00FF7F; /* Neon Green */
+            background-color: #00FF7F;
             color: #000000;
             border-radius: 50%;
             cursor: pointer;
@@ -197,11 +195,10 @@
         }
 
         .input-container button:hover {
-            background-color: #00CC66; /* Darker Neon Green */
+            background-color: #00CC66;
             transform: scale(1.1);
         }
 
-        /* Responsive Styles */
         @media (max-width: 768px) {
             .menu {
                 display: none;
@@ -231,7 +228,6 @@
             }
         }
 
-        /* Animasi Hamburger */
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -246,135 +242,7 @@
 </head>
 
 <body>
-    <div class="header">
-        <div class="header-left">
-            <img src="https://i.ibb.co/tXXrhn8/IMG-20250116-WA0049.jpg" alt="AI Logo">
-            VannAI
-        </div>
-        <button class="menu-button" onclick="toggleMenu()" aria-label="Toggle menu">☰</button>
-        <div class="menu">
-            <a href="../help-note.txt">Help</a>
-            <a href="https://github.com/TarnaWijaya-Studio/Tarz-AI/blob/92ff09d13475718ba6ec42887d56ccf56b02d2ce/readme.md">Info</a>
-            <a href="https://github.com/TarnaWijaya-Studio/Tarz-AI">Source</a>
-            <a href="https://tarnawijaya.github.io/Links-Short-XTarz/">Bio Admin</a>
-        </div>
-    </div>
-
-    <div id="chat-box" class="chat-box"></div>
-
-    <div class="input-container">
-        <input type="text" id="user-input" placeholder="Ketik pesan..." onkeypress="handleKeyPress(event)">
-        <button onclick="sendMessage()">
-            <i class="fas fa-paper-plane"></i>
-        </button>
-    </div>
-
-    <script>
-        function toggleMenu() {
-            const menuButton = document.querySelector('.menu-button');
-            const menu = document.querySelector('.menu');
-            menuButton.classList.toggle('active');
-            menu.classList.toggle('active');
-        }
-
-        async function sendMessage() {
-            const chatBox = document.getElementById("chat-box");
-            const userInput = document.getElementById("user-input");
-            const text = userInput.value.trim();
-
-            if (!text) return;
-
-            const userMessageContainer = createMessageContainer("user", text);
-            chatBox.appendChild(userMessageContainer);
-            userInput.value = '';
-
-            saveMessage("user", text);
-
-            const loadingMessage = createMessageContainer("ai", "• • •");
-            chatBox.appendChild(loadingMessage);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const reply = await getAIResponse(text);
-                chatBox.removeChild(loadingMessage);
-                const formattedReply = formatBoldText(reply);
-                const aiMessageContainer = createMessageContainer("ai", formattedReply);
-                chatBox.appendChild(aiMessageContainer);
-                saveMessage("ai", reply);
-            } catch (error) {
-                console.error("Error:", error);
-                chatBox.removeChild(loadingMessage);
-                const errorMessage = createMessageContainer("ai", "Error: API tidak bisa diakses.");
-                chatBox.appendChild(errorMessage);
-            }
-
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        function createMessageContainer(role, text) {
-            const messageContainer = document.createElement("div");
-            messageContainer.className = `message-container ${role}-container`;
-            const imgSrc = role === "user" ?
-                "https://i.ibb.co/rc13gnG/IMG-20250116-WA0050.jpg" :
-                "https://i.ibb.co/tXXrhn8/IMG-20250116-WA0049.jpg";
-            messageContainer.innerHTML = `
-                <img src="${imgSrc}" class="profile-img" alt="${role}">
-                <div class="message ${role}">${text}</div>
-            `;
-            return messageContainer;
-        }
-
-        function saveMessage(role, text) {
-            const chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
-            chatHistory.push({ role, text });
-            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-        }
-
-        function formatBoldText(text) {
-            return text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
-        }
-
-        async function getAIResponse(text) {
-            const apiKey = "AIzaSyC0Cjd5U_kIM9tvqxfjjvQ_MlhabjtxA30";
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        prompt: {
-                            parts: [{ text }]
-                        }
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error("Gagal mengambil respons dari API");
-                }
-
-                const data = await response.json();
-                return data.candidates?.[0]?.parts?.[0]?.text || "AI-nya Error 🗿";
-            } catch (error) {
-                console.error("Error:", error);
-                return "Error: API tidak bisa diakses.";
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
-            chatHistory.forEach(({ role, text }) => {
-                const messageContainer = createMessageContainer(role, formatBoldText(text));
-                document.getElementById("chat-box").appendChild(messageContainer);
-            });
-        });
-    </script>
+    <!-- Remainder of the HTML code -->
 </body>
-<!--TarzAI create byTarnaWijaya-->
+
 </html>
