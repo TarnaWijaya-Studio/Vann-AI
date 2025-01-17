@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="icon" href="https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg" type="image/jpg">
+  <title>Loading..</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      background: #1a1a1a;
+      cursor: url('img/custom-cursor.png'), auto;
+    }
+
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(-45deg, #6a11cb, #2575fc, #6a11cb, #2575fc);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      z-index: 1000;
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .loading-screen img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      animation: float 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
+    }
+
+    .loading-screen img:hover {
+      transform: scale(1.1);
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .spinner {
+      margin-top: 30px;
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1.5s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      animation: fade-in 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes fade-in {
+      0% {
+        opacity: 0.5;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .progress-bar {
+      width: 80%;
+      max-width: 300px;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    .progress {
+      width: 0;
+      height: 100%;
+      background-color: #fff;
+      border-radius: 10px;
+      animation: progress 5s linear forwards;
+    }
+
+    @keyframes progress {
+      to {
+        width: 100%;
+      }
+    }
+
+    .countdown {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    #floater {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 20px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    #floater:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    #floater:active {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 4px 8px rgba(0, 0, 0, 0.4);
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    #tooltip {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #floater:hover + #tooltip {
+      opacity: 1;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    #theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    #theme-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .light-mode {
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #333;
+    }
+
+    .light-mode .loading-screen {
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #333;
+    }
+
+    .light-mode #floater {
+      background-color: rgba(0, 0, 0, 0.2);
+      color: #333;
+    }
+
+    .light-mode #theme-toggle {
+      background-color: rgba(0, 0, 0, 0.2);
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-screen">
+    <img src="https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg" alt="Loading Image">
+    <div class="spinner"></div>
+    <div class="loading-text">Sedang memuat...</div>
+    <div class="progress-bar">
+      <div class="progress"></div>
+    </div>
+    <div class="countdown">Redirecting in <span id="countdown">5</span> seconds...</div>
+  </div>
+
+  <div id="floater">Developer: Vann | Layanan API: Google</div>
+  <div id="tooltip">Hover untuk info lebih lanjut</div>
+
+  <button id="theme-toggle">Toggle Theme</button>
+
+  <canvas id="particles"></canvas>
+
+  <audio id="bg-music" loop>
+    <source src="audio/background.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    // Countdown Timer
+    let timeLeft = 5;
+    const countdownElement = document.getElementById('countdown');
+    const countdownInterval = setInterval(() => {
+      timeLeft--;
+      countdownElement.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(countdownInterval);
+        cancelAnimationFrame(animationFrameId); // Hentikan animasi partikel
+        window.location.href = '../assets/home.html'; // Redirect ke halaman lain
+      }
+    }, 1000);
+
+    // Particle Animation
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particlesArray = [];
+    let animationFrameId;
+
+    class Particle {
+      constructor(x, y, size, color, velocity) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.color = color;
+        this.velocity = velocity;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        if (this.size > 0.2) this.size -= 0.1;
+      }
+    }
+
+    function init() {
+      particlesArray = [];
+      for (let i = 0; i < 100; i++) {
+        const size = Math.random() * 3 + 1;
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const color = 'rgba(255, 255, 255, 0.8)';
+        const velocity = {
+          x: (Math.random() - 0.5) * 2,
+          y: (Math.random() - 0.5) * 2,
+        };
+        particlesArray.push(new Particle(x, y, size, color, velocity));
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particlesArray.forEach((particle) => {
+        particle.update();
+        particle.draw();
+      });
+      animationFrameId = requestAnimationFrame(animate); // Simpan ID animasi
+    }
+
+    init();
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      init();
+    });
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+    });
+
+    // Background Music
+    const audio = document.getElementById('bg-music');
+    if (audio) {
+      audio.volume = 0.3; // Atur volume agar tidak terlalu keras
+      audio.play().catch(() => {
+        console.log("Autoplay was blocked. Please interact with the page to play audio.");
+      });
+    }
+  </script>
+  <!--src: https://github.com/TarnaWijaya-Studio/Tarz-AI-->
+</body>
+</html>
