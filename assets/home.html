@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>Chat dengan AI</title>
+    <link rel="icon" href="https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg" type="image/jpg">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Styles untuk seluruh halaman */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(to right, #1A1A1A, #000000);
+            color: #FFFFFF;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-left img {
+            width: 35px;
+            height: 35px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        .menu-button {
+            display: none;
+            background-color: transparent;
+            border: none;
+            font-size: 24px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-button.active {
+            transform: rotate(90deg);
+        }
+
+        .menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            padding: 8px 15px;
+            background-color: #333333;
+            border-radius: 5px;
+            color: #FFFFFF;
+            font-size: 14px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .menu a:hover {
+            background-color: #555555;
+            transform: translateY(-2px);
+        }
+
+        /* Chat Box Styles */
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            background: #1A1A1A;
+            scroll-behavior: smooth;
+            border-top: 2px solid #444444;
+        }
+
+        .message-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 20px;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-size: 15px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #444444;
+            color: #FFFFFF;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background-color: #333333;
+            color: #FFFFFF;
+        }
+
+        .message.ai strong {
+            font-weight: bold;
+            color: #00FF7F; /* Neon Green */
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.1);
+        }
+
+        .user-container {
+            flex-direction: row-reverse;
+        }
+
+        .user-container .profile-img {
+            margin-left: 10px;
+        }
+
+        .ai-container .profile-img {
+            margin-right: 10px;
+        }
+
+        .input-container {
+            background-color: #1A1A1A;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            background-color: #333333;
+            color: #FFFFFF;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: border 0.3s ease;
+        }
+
+        .input-container input:focus {
+            outline: none;
+            border: 2px solid #00FF7F; /* Neon Green */
+        }
+
+        .input-container button {
+            padding: 12px;
+            border: none;
+            background-color: #00FF7F; /* Neon Green */
+            color: #000000;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .input-container button:hover {
+            background-color: #00CC66; /* Darker Neon Green */
+            transform: scale(1.1);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .menu {
+                display: none;
+                flex-direction: column;
+                gap: 10px;
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background-color: #333333;
+                padding: 10px;
+                border-radius: 8px;
+                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+                animation: slideDown 0.3s ease-out;
+            }
+
+            .menu-button {
+                display: block;
+            }
+
+            .menu a {
+                padding: 8px 12px;
+                font-size: 16px;
+            }
+
+            .menu-button.active + .menu {
+                display: flex;
+            }
+        }
+
+        /* Animasi Hamburger */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg" alt="AI Logo">
+            VannAI
+        </div>
+        <button class="menu-button" onclick="toggleMenu()" aria-label="Toggle menu">☰</button>
+        <div class="menu">
+            <a href="../help-note.txt">Help</a>
+            <a
+            href="https://github.com/TarnaWijaya-Studio/Tarz-AI/blob/92ff09d13475718ba6ec42887d56ccf56b02d2ce/readme.md">Info</a>
+            <a href="https://github.com/TarnaWijaya-Studio/Tarz-AI">Source</a>
+            <a href="https://tarnawijaya.github.io/Links-Short-XTarz/">Bio Admin</a>
+        </div>
+    </div>
+
+    <div id="chat-box" class="chat-box"></div>
+
+    <div class="input-container">
+        <input type="text" id="user-input" placeholder="Ketik pesan..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menuButton = document.querySelector('.menu-button');
+            menuButton.classList.toggle('active');
+        }
+
+        async function sendMessage() {
+            const chatBox = document.getElementById("chat-box");
+            const userInput = document.getElementById("user-input");
+            const text = userInput.value.trim();
+
+            if (!text) return;
+
+            const userMessageContainer = document.createElement("div");
+            userMessageContainer.className = "message-container user-container";
+            userMessageContainer.innerHTML = `
+                <div class="message user">${text}</div>
+                <img
+                src="https://i.ibb.co.com/rc13gnG/IMG-20250116-WA0050.jpg" class="profile-img"
+                alt="User" class="profile-img">
+            `;
+            chatBox.appendChild(userMessageContainer);
+            userInput.value = '';
+
+            // Menyimpan pesan pengguna di localStorage
+            saveMessage("user", text);
+
+            // Menampilkan pesan loading AI
+            const loadingMessage = createMessageContainer("ai", "• • •");
+            chatBox.appendChild(loadingMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const reply = await getAIResponse(text);
+                chatBox.removeChild(loadingMessage);
+                const formattedReply = formatBoldText(reply); // Format teks bold
+                const aiMessageContainer = createMessageContainer("ai", formattedReply);
+                chatBox.appendChild(aiMessageContainer);
+                saveMessage("ai", reply);
+            } catch (error) {
+                console.error("Error:", error);
+                chatBox.removeChild(loadingMessage);
+                const errorMessage = createMessageContainer("ai", "Error: API tidak bisa diakses.");
+                chatBox.appendChild(errorMessage);
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function createMessageContainer(role, text) {
+            const messageContainer = document.createElement("div");
+            messageContainer.className = `message-container ${role}-container`;
+            const imgSrc = role === "user" ?
+            "https://i.ibb.co.com/rc13gnG/IMG-20250116-WA0050.jpg"
+            : "https://i.ibb.co.com/tXXrhn8/IMG-20250116-WA0049.jpg";
+            messageContainer.innerHTML = `
+                <img src="${imgSrc}" class="profile-img" alt="${role}">
+                <div class="message ${role}">${text}</div>
+            `;
+            return messageContainer;
+        }
+
+        function saveMessage(role, text) {
+            const chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
+            chatHistory.push({ role, text });
+            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+        }
+
+        function formatBoldText(text) {
+            return text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+        }
+
+        async function getAIResponse(text) {
+            const apiKey = "AIzaSyC0Cjd5U_kIM9tvqxfjjvQ_MlhabjtxA30";
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Gagal mengambil respons dari API");
+                }
+
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI-nya Error 🗿";
+            } catch (error) {
+                console.error("Error:", error);
+                return "Error: API tidak bisa diakses.";
+            }
+        }
+    </script>
+</body>
+<!--TarzAI create byTarnaWijaya-->
+</html>
